@@ -2,7 +2,7 @@ name: Currency Scraper
 
 on:
   schedule:
-    - cron: '*/30 * * * *' # Τρέχει κάθε 30 λεπτά
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 jobs:
