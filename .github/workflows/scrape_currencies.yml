@@ -1,27 +1,34 @@
 name: Currency Scraper
+
 on:
   schedule:
-    - cron: '30 * * * *' # Τρέχει κάθε μισάωρο
-  workflow_dispatch:
+    - cron: '30 * * * *' # Τρέχει κάθε 30 λεπτά μετά από κάθε ώρα
+  workflow_dispatch:      # Σου επιτρέπει να το τρέχεις χειροκίνητα
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.9'
+
       - name: Install dependencies
-        run: pip install requests beautifulsoup4
+        run: |
+          pip install yfinance
+
       - name: Run scraper
         run: python currency_scraper.py
-      - name: Commit and Push
+
+      - name: Commit and Push changes
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git add currencies.json
-          git commit -m "Scraped new rates" || exit 0
+          git commit -m "Auto-update currency rates using yfinance" || exit 0
           git push
