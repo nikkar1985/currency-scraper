@@ -1,40 +1,27 @@
-import requests
-from bs4 import BeautifulSoup
+import yfinance as yf
 import json
 
-URL = "https://finance.yahoo.com/currencies"
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-}
+# Λίστα με τα ζεύγη που θέλουμε
+pairs = ["EURUSD=X", "JPY=X", "GBPUSD=X", "AUDUSD=X"]
 
-try:
-    response = requests.get(URL, headers=headers)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    
-    rates = {}
-    # Ψάχνουμε όλες τις σειρές του πίνακα
-    rows = soup.find_all('tr')
-    
-    for row in rows:
-        cells = row.find_all('td')
-        if len(cells) >= 3:
-            # Το όνομα είναι συνήθως στο 2ο κελί και η τιμή στο 3ο
-            name = cells[1].text.strip()
-            price = cells[2].text.strip()
-            
-            # Φιλτράρουμε μόνο τα γνωστά ζεύγη
-            if any(pair in name for pair in ["EUR/USD", "USD/JPY", "GBP/USD", "AUD/USD"]):
-                rates[name] = price
+rates = {}
 
-    if not rates:
-        raise Exception("No rates found. Yahoo might have changed structure.")
+for pair in pairs:
+    try:
+        ticker = yf.Ticker(pair)
+        # Παίρνουμε την τελευταία τιμή (last price)
+        price = ticker.fast_info['last_price']
+        # Καθαρίζουμε το όνομα για την HTML (π.χ. από EURUSD=X σε EUR/USD)
+        display_name = pair.replace("=X", "")
+        if "USD" in display_name and len(display_name) == 6:
+             display_name = f"{display_name[:3]}/{display_name[3:]}"
+             
+        rates[display_name] = round(price, 4)
+    except Exception as e:
+        print(f"Error scraping {pair}: {e}")
 
-    with open('currencies.json', 'w') as f:
-        json.dump(rates, f)
-    print("Success! Data saved.")
+# Αποθήκευση στο JSON
+with open('currencies.json', 'w') as f:
+    json.dump(rates, f)
 
-except Exception as e:
-    print(f"Error detail: {e}")
-    # Αν αποτύχει, φτιάξε ένα dummy αρχείο για να μη σπάει η HTML
-    with open('currencies.json', 'w') as f:
-        json.dump({"Status": "Error fetching live data"}, f)
+print("Data saved successfully!")
