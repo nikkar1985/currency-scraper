@@ -6,25 +6,22 @@ import json
 URL = "https://finance.yahoo.com/currencies"
 headers = {'User-Agent': 'Mozilla/5.0'}
 
-try:
-    response = requests.get(URL, headers=headers)
+response = requests.get(URL, headers=headers)
     soup = BeautifulSoup(response.text, 'html.parser')
     
-    # Ψάχνουμε τα στοιχεία στη σελίδα (αναζήτηση βάσει κλάσης)
-    # Σημείωση: Τα ονόματα των classes αλλάζουν συχνά στο Yahoo
     rates = {}
-    
-    # Παράδειγμα για EUR/USD
+    # Το Yahoo χρησιμοποιεί πλέον data-test="indicator-value" για τις τιμές
     rows = soup.find_all('tr')
-    for row in rows[:5]: # Παίρνουμε τις πρώτες 5 ισοτιμίες
+    for row in rows:
         cols = row.find_all('td')
-        if len(cols) > 1:
-            name = cols[1].text
-            price = cols[2].text
-            rates[name] = price
+        if len(cols) >= 3:
+            name = cols[1].text.strip()  # Το όνομα (π.χ. EUR/USD)
+            price = cols[2].text.strip() # Η τιμή
+            if "/" in name: # Κρατάμε μόνο τα ζεύγη νομισμάτων
+                rates[name] = price
+
+    # Κρατάμε μόνο τα πρώτα 5 για να είναι καθαρό το dashboard
+    final_rates = dict(list(rates.items())[:5])
 
     with open('currencies.json', 'w') as f:
-        json.dump(rates, f)
-    print("Currency data scraped!")
-except Exception as e:
-    print(f"Error: {e}")
+        json.dump(final_rates, f)
