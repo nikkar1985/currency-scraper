@@ -1,7 +1,6 @@
 import yfinance as yf
 import json
 
-# Τα σύμβολα που θέλουμε
 pairs = ["EURUSD=X", "USDJPY=X", "GBPUSD=X", "AUDUSD=X"]
 rates = {}
 
@@ -10,7 +9,7 @@ for pair in pairs:
         ticker = yf.Ticker(pair)
         price = ticker.fast_info['last_price']
         
-        # Μετατροπή ονόματος για την οθόνη (π.χ. EURUSD=X σε EUR/USD)
+       
         name = pair.replace("=X", "")
         if len(name) == 6:
             name = f"{name[:3]}/{name[3:]}"
