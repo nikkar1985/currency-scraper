@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Maximus Currency API</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background: #0d0208; color: #00ff41; padding: 50px; }
+        .data-box { border: 1px solid #00ff41; padding: 20px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <h1>LIVE CURRENCY SCRAPER</h1>
+    <div class="data-box" id="output">Loading scraped data...</div>
+
+    <script>
+        fetch('currencies.json')
+            .then(res => res.json())
+            .then(data => {
+                let text = "";
+                for(let key in data) {
+                    text += `<p>${key}: ${data[key]}</p>`;
+                }
+                document.getElementById('output').innerHTML = text;
+            });
+    </script>
+</body>
+</html>
