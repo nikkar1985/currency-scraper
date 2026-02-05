@@ -1,7 +1,7 @@
 import yfinance as yf
 import json
 
-pairs = ["EURUSD=X", "USDJPY=X", "GBPUSD=X", "AUDUSD=X"]
+pairs = ["EURUSD=X", "USDJPY=X", "GBPUSD=X", "AUDUSD=X", "EURGBP=X"]
 rates = {}
 
 for pair in pairs:
